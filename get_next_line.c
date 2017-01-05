@@ -1,4 +1,4 @@
-#include "libft.h"
+#include "get_next_line.h"
 
 static t_line    *ft_init_list(t_line *list, const int fd)
 {
