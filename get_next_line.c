@@ -1,4 +1,4 @@
-#include "get_next_line.h"
+#include "libft.h"
 
 static t_line    *ft_init_list(t_line *list, const int fd)
 {
@@ -30,8 +30,8 @@ static int    ft_check_buf(t_line *list, char **line)
   if (ft_strchr(list->buf, '\n'))
   {
     *line = ft_strcjoin(*line, list->buf, '\n');
-    list->buf = ft_strsub(list->buf, ft_strclen(list->buf, '\n') + 1,
-      ft_strlen(list->buf) - ft_strclen(list->buf, '\n'));
+    list->buf = ft_strsub(list->buf, (unsigned int)ft_strclen(list->buf,
+      '\n') + 1, ft_strlen(list->buf) - ft_strclen(list->buf, '\n'));
     return (1);
   }
   *line = ft_strjoin(*line, list->buf);
@@ -42,7 +42,7 @@ static int    ft_check_buf(t_line *list, char **line)
 int   get_next_line(const int fd, char **line)
 {
   static t_line *list = NULL;
-  int           i;
+  long           i;
 
   i = 0;
   if (!line || BUFF_SIZE < 1 || fd < 0 || read(fd, 0, 0)
