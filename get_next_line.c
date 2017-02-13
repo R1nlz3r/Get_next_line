@@ -6,73 +6,88 @@
 /*   By: mapandel <mapandel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/04 03:17:08 by mapandel          #+#    #+#             */
-/*   Updated: 2017/02/04 03:17:20 by mapandel         ###   ########.fr       */
+/*   Updated: 2017/02/13 12:06:45 by mapandel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static t_line    *ft_init_list(t_line *list, const int fd)
+static t_line		*ft_init_list(t_line *list, const int fd)
 {
-  t_line    *start;
-  t_line    *previous;
+	t_line    *start;
+	t_line    *previous;
 
-  start = list;
-  previous = NULL;
-  while (list && list->fd != fd)
-  {
-    previous = list;
-    list = list->next;
-  }
-  if (!list)
-  {
-    if (!(list = ft_memalloc(sizeof(t_line)))
-      || !(list->buf = ft_strnew(BUFF_SIZE)))
-      return (NULL);
-    list->fd = fd;
-  }
-  if (previous)
-    previous->next = list->next;
-  list->next = start;
-  return (list);
+	start = list;
+	previous = NULL;
+	while (list && list->fd != fd)
+	{
+		previous = list;
+		list = list->next;
+	}
+	if (!list)
+	{
+		if (!(list = ft_memalloc(sizeof(t_line)))
+			|| !(list->save = ft_strnew(0)))
+			return (NULL);
+		list->fd = fd;
+	}
+	if (previous)
+		previous->next = list->next;
+	if (list != start)
+		list->next = start;
+
+	return (list);
 }
 
-static int    ft_check_buf(t_line *list, char **line)
+static int		ft_check_buf(char *buf, t_line *list, char **line)
 {
-  if (ft_strchr(list->buf, '\n'))
-  {
-    *line = ft_strcjoin(*line, list->buf, '\n');
-    list->buf = ft_strsub(list->buf, (unsigned int)ft_strclen(list->buf,
-      '\n') + 1, ft_strlen(list->buf) - ft_strclen(list->buf, '\n'));
-    return (1);
-  }
-  *line = ft_strjoin(*line, list->buf);
-  ft_strclr(list->buf);
-  return (0);
+	char	*tmp;
+
+	tmp = ft_strdup(*line);
+	ft_strdel(line);
+	if (ft_strrchr(buf, '\n'))
+	{
+		*line = ft_strcjoin(tmp, buf, '\n');
+		list->save = ft_strsub(buf, (unsigned int)ft_strclen(buf,
+			'\n') + 1, ft_strlen(buf) - ft_strclen(buf, '\n'));
+		ft_strdel(&buf);
+		ft_strdel(&tmp);
+		return (1);
+	}
+	*line = ft_strjoin(tmp, buf);
+	ft_strclr(buf);
+	ft_strdel(&tmp);
+	return (0);
 }
 
 int   get_next_line(const int fd, char **line)
 {
-  static t_line *list = NULL;
-  long           i;
+	static t_line	*list = NULL;
+	char			*buf;
+	long			i;
 
-  i = 0;
-  if (!line || BUFF_SIZE < 1 || fd < 0 || read(fd, 0, 0)
-    || !(*line = ft_strnew(0)) || !(list = ft_init_list(list, fd)))
-    return (-1);
-  if (ft_check_buf(list, line))
-    return (1);
-  while ((i = read(fd, list->buf, BUFF_SIZE)))
-  {
-    if (ft_check_buf(list, line))
-      return (1);
-    if (!*line)
-      return (-1);
-    if (i < BUFF_SIZE)
-      break ;
-  }
-  if (**line)
-    return (1);
-  ft_strdel(&list->buf);
-  return(0);
+	i = 0;
+	if (!line || BUFF_SIZE < 1 || fd < 0 || read(fd, 0, 0)
+		|| !(*line = ft_strnew(0)) || !(list = ft_init_list(list, fd))
+		|| !(buf = ft_strnew(BUFF_SIZE)))
+		return (-1);
+	if (ft_check_buf(list->save, list, line))
+		return (1);
+	while ((i = read(fd, buf, BUFF_SIZE)))
+	{
+		buf[i] = '\0';
+		if (ft_check_buf(buf, list, line))
+			return (1);
+		if (!*line)
+			return (-1);
+		if (i < BUFF_SIZE)
+			break ;
+	}
+	if (**line)
+	{
+		ft_strdel(&buf);
+		return (1);
+	}
+	ft_strdel(&list->save);
+	return(0);
 }
