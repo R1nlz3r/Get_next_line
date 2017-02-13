@@ -6,7 +6,7 @@
 /*   By: mapandel <mapandel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/04 03:17:08 by mapandel          #+#    #+#             */
-/*   Updated: 2017/02/13 12:06:45 by mapandel         ###   ########.fr       */
+/*   Updated: 2017/02/13 14:30:45 by mapandel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 static t_line		*ft_init_list(t_line *list, const int fd)
 {
-	t_line    *start;
-	t_line    *previous;
+	t_line		*start;
+	t_line		*previous;
 
 	start = list;
 	previous = NULL;
@@ -35,11 +35,10 @@ static t_line		*ft_init_list(t_line *list, const int fd)
 		previous->next = list->next;
 	if (list != start)
 		list->next = start;
-
 	return (list);
 }
 
-static int		ft_check_buf(char *buf, t_line *list, char **line)
+static int			ft_check_buf(char *buf, t_line *list, char **line)
 {
 	char	*tmp;
 
@@ -60,7 +59,19 @@ static int		ft_check_buf(char *buf, t_line *list, char **line)
 	return (0);
 }
 
-int   get_next_line(const int fd, char **line)
+static int			ft_end_gnl(t_line *list, char **line, char *buf)
+{
+	if (**line)
+	{
+		ft_strdel(&buf);
+		return (1);
+	}
+	ft_strdel(&list->save);
+	list->fd = 0;
+	return (0);
+}
+
+int					get_next_line(const int fd, char **line)
 {
 	static t_line	*list = NULL;
 	char			*buf;
@@ -68,7 +79,8 @@ int   get_next_line(const int fd, char **line)
 
 	i = 0;
 	if (!line || BUFF_SIZE < 1 || fd < 0 || read(fd, 0, 0)
-		|| !(*line = ft_strnew(0)) || !(list = ft_init_list(list, fd))
+		|| !(*line = ft_strnew(0))
+		|| !(list = ft_init_list(list, fd))
 		|| !(buf = ft_strnew(BUFF_SIZE)))
 		return (-1);
 	if (ft_check_buf(list->save, list, line))
@@ -83,11 +95,7 @@ int   get_next_line(const int fd, char **line)
 		if (i < BUFF_SIZE)
 			break ;
 	}
-	if (**line)
-	{
-		ft_strdel(&buf);
+	if (ft_end_gnl(list, line, buf))
 		return (1);
-	}
-	ft_strdel(&list->save);
-	return(0);
+	return (0);
 }
