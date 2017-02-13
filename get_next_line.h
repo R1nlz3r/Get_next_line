@@ -6,12 +6,12 @@
 /*   By: mapandel <mapandel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/04 03:17:20 by mapandel          #+#    #+#             */
-/*   Updated: 2017/02/13 12:06:48 by mapandel         ###   ########.fr       */
+/*   Updated: 2017/02/13 14:10:51 by mapandel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE
-# define GET_NEXT_LINE
+#ifndef GET_NEXT_LINE_H
+# define GET_NEXT_LINE_H
 
 # include "./libft/libft.h"
 # define BUFF_SIZE 10000
@@ -24,6 +24,6 @@ typedef struct		s_line
 	char			*save;
 }					t_line;
 
-int		get_next_line(const int fd, char **line);
+int					get_next_line(const int fd, char **line);
 
 #endif
