@@ -6,7 +6,7 @@
 /*   By: mapandel <mapandel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/04 03:17:08 by mapandel          #+#    #+#             */
-/*   Updated: 2017/02/13 14:30:45 by mapandel         ###   ########.fr       */
+/*   Updated: 2017/02/16 17:09:52 by mapandel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,7 @@ static t_line		*ft_init_list(t_line *list, const int fd)
 	}
 	if (!list)
 	{
-		if (!(list = ft_memalloc(sizeof(t_line)))
-			|| !(list->save = ft_strnew(0)))
+		if (!(list = ft_memalloc(sizeof(t_line))))
 			return (NULL);
 		list->fd = fd;
 	}
@@ -83,7 +82,7 @@ int					get_next_line(const int fd, char **line)
 		|| !(list = ft_init_list(list, fd))
 		|| !(buf = ft_strnew(BUFF_SIZE)))
 		return (-1);
-	if (ft_check_buf(list->save, list, line))
+	if (list->save && ft_check_buf(list->save, list, line))
 		return (1);
 	while ((i = read(fd, buf, BUFF_SIZE)))
 	{
